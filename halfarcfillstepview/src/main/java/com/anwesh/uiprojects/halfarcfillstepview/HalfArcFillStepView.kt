@@ -217,4 +217,26 @@ class HalfArcFillStepView(ctx : Context) : View(ctx) {
             curr.startUpdating(cb)
         }
     }
+
+    data class Renderer(var view : HalfArcFillStepView) {
+
+        private val animator : Animator = Animator(view)
+        private val hafs : HalfArcFillStep = HalfArcFillStep(0)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(backColor)
+            hafs.draw(canvas, paint)
+            animator.animate {
+                hafs.update {i, scl ->
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            hafs.startUpdating {
+                animator.start()
+            }
+        }
+    }
 }
