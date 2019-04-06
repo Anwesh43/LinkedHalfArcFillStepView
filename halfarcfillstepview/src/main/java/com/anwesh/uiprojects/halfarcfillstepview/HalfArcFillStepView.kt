@@ -59,8 +59,9 @@ fun Canvas.drawHalfArc(x : Float, sc1 : Float, sc2 : Float, r : Float, paint : P
             val path : Path = Path()
             path.addArc(arcRect, arcDeg, arcDeg)
             it.drawClip(path) {
+                val rh : Float = r + paint.strokeWidth
                 paint.style = Paint.Style.FILL
-                drawRect(RectF(-r, -r, r, -r + r * sc2), paint)
+                drawRect(RectF(-r, -rh , r, -rh + rh * sc2), paint)
             }
             paint.style = Paint.Style.STROKE
             drawArc(RectF(arcRect), arcDeg, arcDeg, false, paint)
@@ -73,11 +74,15 @@ fun Canvas.drawHAFNode(i : Int, scale : Float, paint : Paint) {
     val h : Float = height.toFloat()
     val gap : Float = h / (nodes + 1)
     val size : Float = gap / sizeFactor
-    val xGap : Float = size / (arcs)
+    val xGap : Float = (2 * size) / (arcs)
     val sc1 : Float = scale.divideScale(0, 2)
     val sc2 : Float = scale.divideScale(1, 2)
+    paint.color = foreColor
+    paint.strokeWidth = Math.min(w, h) / strokeFactor
+    paint.strokeCap = Paint.Cap.ROUND
     drawXY(w / 2, gap * (i + 1)) {
-        for (j in 0..(arcs)) {
+        drawLine(-size, 0f, size, 0f, paint)
+        for (j in 0..(arcs - 1)) {
             val scj1 : Float = sc1.divideScale(j, arcs)
             val scj2 : Float = sc2.divideScale(j, arcs)
             it.drawHalfArc(-size + xGap * j + xGap / 2, scj1, scj2, xGap / 2, paint)
