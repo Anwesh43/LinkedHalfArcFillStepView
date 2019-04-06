@@ -240,4 +240,13 @@ class HalfArcFillStepView(ctx : Context) : View(ctx) {
             }
         }
     }
+
+    companion object {
+
+        fun create(activity : Activity) : HalfArcFillStepView {
+            val view : HalfArcFillStepView = HalfArcFillStepView(activity)
+            activity.setContentView(view)
+            return view
+        }
+    }
 }
