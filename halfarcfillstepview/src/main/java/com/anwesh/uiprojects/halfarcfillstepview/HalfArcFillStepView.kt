@@ -80,7 +80,7 @@ fun Canvas.drawHAFNode(i : Int, scale : Float, paint : Paint) {
         for (j in 0..(arcs)) {
             val scj1 : Float = sc1.divideScale(j, arcs)
             val scj2 : Float = sc2.divideScale(j, arcs)
-            it.drawHalfArc(-size + xGap * j, scj1, scj2, xGap / 2, paint)
+            it.drawHalfArc(-size + xGap * j + xGap / 2, scj1, scj2, xGap / 2, paint)
         }
     }
 }
@@ -147,6 +147,50 @@ class HalfArcFillStepView(ctx : Context) : View(ctx) {
             if (animated) {
                 animated = false
             }
+        }
+    }
+
+    data class HAFNode(var i : Int, val state : State = State()) {
+
+        private var next : HAFNode? = null
+        private var prev : HAFNode? = null
+
+        init {
+            addNeighbor()
+        }
+
+        fun addNeighbor() {
+            if (i < nodes - 1) {
+                next = HAFNode(i + 1)
+                next?.prev = this
+            }
+        }
+
+        fun draw(canvas : Canvas, paint : Paint) {
+            canvas.drawHAFNode(i, state.scale, paint)
+            next?.draw(canvas, paint)
+        }
+
+        fun update(cb : (Int, Float) -> Unit) {
+            state.update {
+                cb(i, it)
+            }
+        }
+
+        fun startUpdating(cb : () -> Unit) {
+            state.startUpdating(cb)
+        }
+
+        fun getNext(dir : Int, cb : () -> Unit) : HAFNode {
+            var curr : HAFNode? = prev
+            if (dir == 1) {
+                curr = next
+            }
+            if (curr != null) {
+                return curr
+            }
+            cb()
+            return this
         }
     }
 }
